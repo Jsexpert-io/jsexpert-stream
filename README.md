@@ -2,6 +2,18 @@
 
 `jsexpert-stream` is the multi-tenant ingestion boundary for JsExpert. It authenticates an SDK request against the project registry, derives the tenant and project identifiers server-side, and publishes durable events to Kafka.
 
+## Code layout
+
+The executable is deliberately a small composition root. Each layer has one responsibility:
+
+- `src/config.rs` — validated environment configuration and topic naming.
+- `src/domain/` — event contracts, validation, identity, and partition-key rules.
+- `src/auth.rs` — project credential authentication against PostgreSQL.
+- `src/transport/http.rs` — HTTP request/response handling only.
+- `src/transport/kafka.rs` — idempotent Kafka publishing and DLQ writes.
+- `src/infrastructure/consumer.rs` — Kafka consumption and offset-commit policy.
+- `src/infrastructure/clickhouse.rs` — analytical schema and durable event storage.
+
 ## Event flow
 
 ```text
